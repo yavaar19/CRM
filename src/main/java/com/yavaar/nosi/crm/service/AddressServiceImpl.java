@@ -5,6 +5,7 @@ import com.yavaar.nosi.crm.entity.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +29,22 @@ public class AddressServiceImpl implements AddressService{
         Optional<Address> address = addressDao.findById(id);
 
         return address;
+
+    }
+
+    @Override
+    public void deleteAddressById(Long id) {
+
+        addressDao.deleteById(id);
+
+    }
+
+    @Override
+    public List<Address> findAllAddresses() {
+
+        List<Address> addresses = addressDao.findAll();
+
+        return addresses;
 
     }
 

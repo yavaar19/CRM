@@ -40,7 +40,7 @@ public class CustomerServiceTest {
     }
 
     @Test
-    public void canAddCustomer() {
+    public void canSaveCustomer() {
 
         Customer savedCustomer = customerService.saveCustomer(customer);
 
@@ -57,6 +57,24 @@ public class CustomerServiceTest {
         Customer foundCustomer = customerService.findCustomerById(savedCustomer.getId()).get();
 
         assertEquals(savedCustomer.getId(), foundCustomer.getId());
+
+    }
+
+    @Test
+    public void canFindAllCustomers() {
+
+        Customer customer1 = new Customer("Yavaar", "Nosimohomed","yavaar@gmail.com" , LocalDate.of(1990, 10, 17));
+        Customer customer2 = new Customer("Shahaad", "Nosimohomed","shahaad@gmail.com" , LocalDate.of(1990, 10, 17));
+        Customer customer3 = new Customer("Fazilet", "Nosimohomed","fazilet@gmail.com" , LocalDate.of(1990, 10, 17));
+
+        customerService.saveCustomer(customer);
+        customerService.saveCustomer(customer1);
+        customerService.saveCustomer(customer2);
+        customerService.saveCustomer(customer3);
+
+        List<Customer> customers = customerService.findAllCustomers();
+
+        assertEquals(4, customers.size());
 
     }
 
@@ -93,24 +111,6 @@ public class CustomerServiceTest {
         Optional<Customer> deletedCustomer = customerService.findCustomerById(customer.getId());
 
         assertTrue(deletedCustomer.isEmpty());
-
-    }
-
-    @Test
-    public void canFindAllCustomers() {
-
-        Customer customer1 = new Customer("Yavaar", "Nosimohomed","yavaar@gmail.com" , LocalDate.of(1990, 10, 17));
-        Customer customer2 = new Customer("Shahaad", "Nosimohomed","shahaad@gmail.com" , LocalDate.of(1990, 10, 17));
-        Customer customer3 = new Customer("Fazilet", "Nosimohomed","fazilet@gmail.com" , LocalDate.of(1990, 10, 17));
-
-        customerService.saveCustomer(customer);
-        customerService.saveCustomer(customer1);
-        customerService.saveCustomer(customer2);
-        customerService.saveCustomer(customer3);
-
-        List<Customer> customers = customerService.findAllCustomers();
-
-        assertEquals(4, customers.size());
 
     }
 
