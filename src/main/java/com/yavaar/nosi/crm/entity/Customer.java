@@ -3,6 +3,8 @@ package com.yavaar.nosi.crm.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +23,14 @@ public class Customer {
     private String email;
     @Column(name = "date_of_birth")
     private LocalDate dob;
+
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "customer_address",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private List<Address> addresses;
 
     public Customer() {
     }
@@ -70,6 +80,26 @@ public class Customer {
 
     public void setDob(LocalDate dob) {
         this.dob = dob;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public void addAddress(Address address) {
+
+        if (addresses == null) {
+
+            addresses = new ArrayList<>();
+
+        }
+
+        addresses.add(address);
+
     }
 
     @Override

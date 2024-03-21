@@ -55,4 +55,13 @@ public class CustomerServiceImpl implements CustomerService{
 
     }
 
+    @Override
+    public Customer findCustomerAndAddressesByCustomerId(long id) {
+
+        Customer customer = customerDao.findCustomerAndAddressesByCustomerId(id);
+
+        return customer;
+
+    }
+
 }
