@@ -15,7 +15,7 @@ public class CustomerServiceImpl implements CustomerService{
     private CustomerDao customerDao;
 
     @Override
-    public Customer save(Customer customer) {
+    public Customer saveCustomer(Customer customer) {
 
         Customer savedCustomer = customerDao.save(customer);
 
@@ -24,7 +24,7 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Optional <Customer> findById(long id) {
+    public Optional <Customer> findCustomerById(long id) {
 
         Optional<Customer> foundCustomer = customerDao.findById(id);
 
@@ -40,14 +40,14 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public void deleteCustomer(Customer customer) {
+    public void deleteCustomerById(long id) {
 
-        customerDao.delete(customer);
+        customerDao.deleteById(id);
 
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAllCustomers() {
 
         List<Customer> customerList = customerDao.findAll();
 
@@ -56,7 +56,7 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Customer findCustomerAndAddressesByCustomerId(long id) {
+    public Customer findCustomerByIdJoinFetch(long id) {
 
         Customer customer = customerDao.findCustomerAndAddressesByCustomerId(id);
 

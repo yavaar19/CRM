@@ -1,10 +1,7 @@
 package com.yavaar.nosi.crm.integration;
 
-import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
 import com.yavaar.nosi.crm.service.CustomerService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +26,6 @@ public class CustomerServiceTest {
     @Autowired
     private JdbcTemplate jdbc;
 
-    @Value("${sql.script.delete.customer_address}")
-    private String sqlDeleteCustomerAddress;
-
-    @Value("${sql.script.delete.address}")
-    private String sqlDeleteAddress;
-
     @Value("${sql.script.delete.customer}")
     private String sqlDeleteCustomer;
     private Customer customer;
@@ -42,8 +33,6 @@ public class CustomerServiceTest {
     @BeforeEach
     public void setUp() {
 
-        jdbc.execute(sqlDeleteCustomerAddress);
-        jdbc.execute(sqlDeleteAddress);
         jdbc.execute(sqlDeleteCustomer);
 
         customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
@@ -53,7 +42,7 @@ public class CustomerServiceTest {
     @Test
     public void canAddCustomer() {
 
-        Customer savedCustomer = customerService.save(customer);
+        Customer savedCustomer = customerService.saveCustomer(customer);
 
         assertTrue(savedCustomer.getId() > 0);
         assertEquals(customer.getId(), savedCustomer.getId());
@@ -63,9 +52,9 @@ public class CustomerServiceTest {
     @Test
     public void canFindCustomer() {
 
-        Customer savedCustomer = customerService.save(customer);
+        Customer savedCustomer = customerService.saveCustomer(customer);
 
-        Customer foundCustomer = customerService.findById(savedCustomer.getId()).get();
+        Customer foundCustomer = customerService.findCustomerById(savedCustomer.getId()).get();
 
         assertEquals(savedCustomer.getId(), foundCustomer.getId());
 
@@ -74,16 +63,16 @@ public class CustomerServiceTest {
     @Test
     public void canUpdateCustomer() {
 
-        customerService.save(customer);
+        customerService.saveCustomer(customer);
 
-        Customer foundCustomer = customerService.findById(customer.getId()).get();
+        Customer foundCustomer = customerService.findCustomerById(customer.getId()).get();
 
         customer.setFirstName("Yavaar");
         customer.setLastName("Nosimohomed");
 
         customerService.updateCustomer(customer);
 
-        Customer foundUpdatedCustomer = customerService.findById(customer.getId()).get();
+        Customer foundUpdatedCustomer = customerService.findCustomerById(customer.getId()).get();
 
         assertNotEquals(foundCustomer.getFirstName(), foundUpdatedCustomer.getFirstName());
         assertNotEquals(foundCustomer.getLastName(), foundUpdatedCustomer.getLastName());
@@ -93,15 +82,15 @@ public class CustomerServiceTest {
     @Test
     public void canDeleteCustomer() {
 
-        customerService.save(customer);
+        customerService.saveCustomer(customer);
 
-        Customer foundCustomer = customerService.findById(customer.getId()).get();
+        Customer foundCustomer = customerService.findCustomerById(customer.getId()).get();
 
         assertEquals(customer, foundCustomer);
 
-        customerService.deleteCustomer(customer);
+        customerService.deleteCustomerById(customer.getId());
 
-        Optional<Customer> deletedCustomer = customerService.findById(customer.getId());
+        Optional<Customer> deletedCustomer = customerService.findCustomerById(customer.getId());
 
         assertTrue(deletedCustomer.isEmpty());
 
@@ -114,12 +103,12 @@ public class CustomerServiceTest {
         Customer customer2 = new Customer("Shahaad", "Nosimohomed","shahaad@gmail.com" , LocalDate.of(1990, 10, 17));
         Customer customer3 = new Customer("Fazilet", "Nosimohomed","fazilet@gmail.com" , LocalDate.of(1990, 10, 17));
 
-        customerService.save(customer);
-        customerService.save(customer1);
-        customerService.save(customer2);
-        customerService.save(customer3);
+        customerService.saveCustomer(customer);
+        customerService.saveCustomer(customer1);
+        customerService.saveCustomer(customer2);
+        customerService.saveCustomer(customer3);
 
-        List<Customer> customers = customerService.findAll();
+        List<Customer> customers = customerService.findAllCustomers();
 
         assertEquals(4, customers.size());
 
