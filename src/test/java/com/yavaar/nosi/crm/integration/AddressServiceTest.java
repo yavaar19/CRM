@@ -3,7 +3,7 @@ package com.yavaar.nosi.crm.integration;
 import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
 import com.yavaar.nosi.crm.service.AddressService;
-import com.yavaar.nosi.crm.service.CustomerService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,43 +12,54 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
-public class AddressServiceTest {
-
-    @Autowired
-    CustomerService customerService;
+class AddressServiceTest {
 
     @Autowired
     private JdbcTemplate jdbc;
 
+    @Value("${sql.script.delete.customer}")
+    private String SQLDELETECUSTOMER;
+
     @Value("${sql.script.delete.address}")
-    private String sqlDeleteAddress;
-    private Address address;
+    private String SQLDELETEADDRESS;
+
+    @Value("${sql.script.delete.customer_address}")
+    private String SQLDELETECUSTOMERADDRESS;
 
     @Autowired
     private AddressService addressService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
-        jdbc.execute(sqlDeleteAddress);
+        jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
+                + "VALUES(1, 58, 'Windsor Road', 'Etobicoke', 'ON', 'M9R-3G5')");
 
-        address = new Address(58, "Windsor Road","Etobicoke" , "ON", "M9R-3G5");
+    }
+
+    @AfterEach
+    void cleanUpDatabase() {
+
+        jdbc.execute(SQLDELETECUSTOMERADDRESS);
+        jdbc.execute(SQLDELETECUSTOMER);
+        jdbc.execute(SQLDELETEADDRESS);
 
     }
 
     @Test
-    public void canSaveAddress() {
+    void canSaveAddress() {
+
+        Address address = new Address(58, "Windsor Road","Etobicoke" , "ON", "M9R-3G5");
 
         Address savedAddress = addressService.saveAddress(address);
-
         Address foundAddress = addressService.findAddressById(savedAddress.getId()).get();
 
         assertEquals(savedAddress, foundAddress);
@@ -56,62 +67,81 @@ public class AddressServiceTest {
     }
 
     @Test
-    public void canFindAddress() {
+    void canFindAddress() {
 
-        Address savedAddress = addressService.saveAddress(address);
+        Optional<Address> foundAddress = addressService.findAddressById(1);
 
-        Address foundAddress = addressService.findAddressById(savedAddress.getId()).get();
-
-        assertEquals(savedAddress, foundAddress);
+        assertTrue(foundAddress.isPresent());
 
     }
 
     @Test
-    public void canFindAllAddresses() {
+    void canFindAllAddresses() {
 
-        Address address1 = new Address(380, "Dixon Road","Etobicoke" , "ON", "M9R-1T3");
-        Address address2 = new Address(1735, "Kipling Ave","Etobicoke" , "ON", "M9R-4H5");
-        addressService.saveAddress(address);
-        addressService.saveAddress(address2);
-        addressService.saveAddress(address1);
+        jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
+                + "VALUES(2, 380, 'Dixon Road', 'Etobicoke', 'ON', 'M9R-1T3')");
+        jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
+                + "VALUES(3, 1735, 'Kipling Ave', 'Etobicoke', 'ON', 'M9R-4H6')");
+        jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
+                + "VALUES(4, 95, 'Islington Ave', 'Etobicoke', 'ON', 'M9R-8J7')");
 
         List<Address> foundAddresses = addressService.findAllAddresses();
 
-        assertEquals(3, foundAddresses.size());
+        assertEquals(4, foundAddresses.size());
 
     }
 
     @Test
-    public void canUpdateAddress() {
+    void canUpdateAddress() {
 
-        Address savedAddress = addressService.saveAddress(address);
+        Optional<Address> foundAddress = addressService.findAddressById(1);
 
-        Address foundAddress = addressService.findAddressById(savedAddress.getId()).get();
+        assertEquals(58, foundAddress.get().getStreetNumber());
 
-        foundAddress.setStreetNumber(100);
+        foundAddress.get().setStreetNumber(100);
 
-        addressService.saveAddress(foundAddress);
+        addressService.updateAddress(foundAddress.get());
 
-        Address updatedAddress = addressService.findAddressById(savedAddress.getId()).get();
+        Address updatedAddress = addressService.findAddressById(1).get();
 
-        assertEquals(foundAddress.getStreetNumber(), updatedAddress.getStreetNumber());
+        assertEquals(100, updatedAddress.getStreetNumber());
 
     }
 
     @Test
-    public void canDeleteAddress() {
+    void canDeleteAddress() {
 
-        Address savedAddress = addressService.saveAddress(address);
+        assertTrue(addressService.findAddressById(1).isPresent());
 
-        addressService.deleteAddressById(savedAddress.getId());
+        addressService.deleteAddressById(1);
 
-        Optional<Address> foundAddress = addressService.findAddressById(savedAddress.getId());
+        Optional<Address> foundAddress = addressService.findAddressById(1);
 
         assertTrue(foundAddress.isEmpty());
 
+    }
+
+    @Test
+    void canFindAddressByIdJoinFetchCustomer() {
+
+        Address address = new Address(58, "Windsor Road","Etobicoke" , "ON", "M9R-3G5");
+        Customer customer = new Customer("Yavaar", "Nosimohomed", "yavaar@gmail.com", LocalDate.of(1989, 10, 01));
+        address.addCustomer(customer);
+        Address savedAddress = addressService.saveAddress(address);
+
+        Address foundAddress = addressService.findAddressByIdJoinFetchCustomer(savedAddress.getId());
+
+        assertFalse(foundAddress.getCustomers().isEmpty());
+
 
     }
 
+    @Test
+    void isAddressNullCheck() {
 
+        assertFalse(addressService.checkIfAddressIsNull(1));
+        assertTrue(addressService.checkIfAddressIsNull(0));
+
+    }
 
 }

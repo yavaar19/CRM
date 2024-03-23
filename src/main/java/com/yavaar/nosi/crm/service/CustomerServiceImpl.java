@@ -17,18 +17,14 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public Customer saveCustomer(Customer customer) {
 
-        Customer savedCustomer = customerDao.save(customer);
-
-        return savedCustomer;
+        return customerDao.save(customer);
 
     }
 
     @Override
     public Optional <Customer> findCustomerById(long id) {
 
-        Optional<Customer> foundCustomer = customerDao.findById(id);
-
-        return foundCustomer;
+        return customerDao.findById(id);
 
     }
 
@@ -49,18 +45,23 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public List<Customer> findAllCustomers() {
 
-        List<Customer> customerList = customerDao.findAll();
-
-        return customerList;
+        return customerDao.findAll();
 
     }
 
     @Override
-    public Customer findCustomerByIdJoinFetch(long id) {
+    public Customer findCustomerByIdJoinFetchAddress(long id) {
 
-        Customer customer = customerDao.findCustomerAndAddressesByCustomerId(id);
+        return customerDao.findCustomerByIdJoinFetchAddress(id);
 
-        return customer;
+    }
+
+    @Override
+    public boolean checkIfStudentIsNull(long id) {
+
+        Optional<Customer> customer = findCustomerById(id);
+
+        return customer.isEmpty();
 
     }
 

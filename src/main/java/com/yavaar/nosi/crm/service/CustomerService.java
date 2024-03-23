@@ -12,7 +12,7 @@ public interface CustomerService {
     void updateCustomer(Customer customer);
     void deleteCustomerById(long id);
     List<Customer> findAllCustomers();
-    Customer findCustomerByIdJoinFetch(long id);
-
+    Customer findCustomerByIdJoinFetchAddress(long id);
+    boolean checkIfStudentIsNull(long i);
 
 }

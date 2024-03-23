@@ -17,23 +17,25 @@ public class AddressServiceImpl implements AddressService{
     @Override
     public Address saveAddress(Address address) {
 
-        Address savedAddress = addressDao.save(address);
-
-        return savedAddress;
+        return addressDao.save(address);
 
     }
 
     @Override
-    public Optional<Address> findAddressById(Long id) {
+    public void updateAddress(Address address) {
 
-        Optional<Address> address = addressDao.findById(id);
-
-        return address;
+        addressDao.save(address);
 
     }
 
     @Override
-    public void deleteAddressById(Long id) {
+    public Optional<Address> findAddressById(long id) {
+
+        return addressDao.findById(id);
+
+    }
+
+    public void deleteAddressById(long id) {
 
         addressDao.deleteById(id);
 
@@ -42,9 +44,24 @@ public class AddressServiceImpl implements AddressService{
     @Override
     public List<Address> findAllAddresses() {
 
-        List<Address> addresses = addressDao.findAll();
+        return addressDao.findAll();
 
-        return addresses;
+    }
+
+    @Override
+    public Address findAddressByIdJoinFetchCustomer(long id) {
+
+        return addressDao.findAddressByIdJoinFetchCustomer(id);
+
+    }
+
+    @Override
+    public boolean checkIfAddressIsNull(long id) {
+
+        Optional<Address> address = findAddressById(id);
+
+        return address.isEmpty();
+
 
     }
 

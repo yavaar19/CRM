@@ -1,7 +1,9 @@
 package com.yavaar.nosi.crm.integration;
 
+import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
 import com.yavaar.nosi.crm.service.CustomerService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
-public class CustomerServiceTest {
+class CustomerServiceTest {
 
     @Autowired
     CustomerService customerService;
@@ -27,20 +29,35 @@ public class CustomerServiceTest {
     private JdbcTemplate jdbc;
 
     @Value("${sql.script.delete.customer}")
-    private String sqlDeleteCustomer;
-    private Customer customer;
+    private String SQLDELETECUSTOMER;
+
+    @Value("${sql.script.delete.address}")
+    private String SQLDELETEADDRESS;
+
+    @Value("${sql.script.delete.customer_address}")
+    private String SQLDELETECUSTOMERADDRESS;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
-        jdbc.execute(sqlDeleteCustomer);
+        jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
+                + "VALUES(1, 'Nuzhah', 'Peerally', 'nuzhah@gmail.com', '1990-10-17')");
 
-        customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
+    }
+
+    @AfterEach
+    void cleanUpDatabase() {
+
+        jdbc.execute(SQLDELETECUSTOMERADDRESS);
+        jdbc.execute(SQLDELETECUSTOMER);
+        jdbc.execute(SQLDELETEADDRESS);
 
     }
 
     @Test
-    public void canSaveCustomer() {
+    void canSaveCustomer() {
+
+        Customer customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
 
         Customer savedCustomer = customerService.saveCustomer(customer);
 
@@ -50,27 +67,23 @@ public class CustomerServiceTest {
     }
 
     @Test
-    public void canFindCustomer() {
+    void canFindCustomer() {
 
-        Customer savedCustomer = customerService.saveCustomer(customer);
+        Optional<Customer> foundCustomer = customerService.findCustomerById(1);
 
-        Customer foundCustomer = customerService.findCustomerById(savedCustomer.getId()).get();
-
-        assertEquals(savedCustomer.getId(), foundCustomer.getId());
+        assertTrue(foundCustomer.isPresent());
 
     }
 
     @Test
-    public void canFindAllCustomers() {
+    void canFindAllCustomers() {
 
-        Customer customer1 = new Customer("Yavaar", "Nosimohomed","yavaar@gmail.com" , LocalDate.of(1990, 10, 17));
-        Customer customer2 = new Customer("Shahaad", "Nosimohomed","shahaad@gmail.com" , LocalDate.of(1990, 10, 17));
-        Customer customer3 = new Customer("Fazilet", "Nosimohomed","fazilet@gmail.com" , LocalDate.of(1990, 10, 17));
-
-        customerService.saveCustomer(customer);
-        customerService.saveCustomer(customer1);
-        customerService.saveCustomer(customer2);
-        customerService.saveCustomer(customer3);
+        jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
+                + "VALUES(2, 'Yavaar', 'Nosimohomed', 'yavaar@gmail.com', '1912-11-11')");
+        jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
+                + "VALUES(3, 'Varun', 'Pandit', 'varun@gmail.com', '19952-03-10')");
+        jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
+                + "VALUES(4, 'Shahaad', 'Nosi', 'shahaad@gmail.com', '1990-05-03')");
 
         List<Customer> customers = customerService.findAllCustomers();
 
@@ -79,38 +92,51 @@ public class CustomerServiceTest {
     }
 
     @Test
-    public void canUpdateCustomer() {
+    void canUpdateCustomer() {
 
-        customerService.saveCustomer(customer);
+        Optional<Customer> foundCustomer = customerService.findCustomerById(1);
 
-        Customer foundCustomer = customerService.findCustomerById(customer.getId()).get();
+        foundCustomer.get().setLastName("Nosimohomed");
 
-        customer.setFirstName("Yavaar");
-        customer.setLastName("Nosimohomed");
+        customerService.updateCustomer(foundCustomer.get());
 
-        customerService.updateCustomer(customer);
+        Optional<Customer> updatedCustomer = customerService.findCustomerById(1);
 
-        Customer foundUpdatedCustomer = customerService.findCustomerById(customer.getId()).get();
-
-        assertNotEquals(foundCustomer.getFirstName(), foundUpdatedCustomer.getFirstName());
-        assertNotEquals(foundCustomer.getLastName(), foundUpdatedCustomer.getLastName());
+        assertEquals("Nosimohomed", updatedCustomer.get().getLastName());
 
     }
 
     @Test
-    public void canDeleteCustomer() {
+    void canDeleteCustomer() {
 
-        customerService.saveCustomer(customer);
+        assertTrue(customerService.findCustomerById(1).isPresent());
 
-        Customer foundCustomer = customerService.findCustomerById(customer.getId()).get();
+        customerService.deleteCustomerById(1);
 
-        assertEquals(customer, foundCustomer);
+        assertFalse(customerService.findCustomerById(1).isPresent());
 
-        customerService.deleteCustomerById(customer.getId());
+    }
 
-        Optional<Customer> deletedCustomer = customerService.findCustomerById(customer.getId());
+    @Test
+    void canFindCustomerByIdJoinFetchAddress() {
 
-        assertTrue(deletedCustomer.isEmpty());
+        Address address = new Address(58, "Windsor Road", "Etobicoke", "ON", "M9R-3G5");
+        Customer customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
+
+        customer.addAddress(address);
+        Customer savedCustomer = customerService.saveCustomer(customer);
+
+        Customer foundCustomer = customerService.findCustomerByIdJoinFetchAddress(savedCustomer.getId());
+
+        assertFalse(foundCustomer.getAddresses().isEmpty());
+
+    }
+
+    @Test
+    void isCustomerNullCheck() {
+
+        assertFalse(customerService.checkIfStudentIsNull(1));
+        assertTrue(customerService.checkIfStudentIsNull(0));
 
     }
 
