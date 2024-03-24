@@ -32,6 +32,9 @@ public class Customer {
     )
     private List<Address> addresses;
 
+    @OneToMany(mappedBy = "customer", cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
+    private List<Order> orders;
+
     public Customer() {
     }
 
@@ -90,6 +93,14 @@ public class Customer {
         this.addresses = addresses;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     public void addAddress(Address address) {
 
         if (addresses == null) {
@@ -99,6 +110,18 @@ public class Customer {
         }
 
         addresses.add(address);
+
+    }
+
+    public void addOrder(Order order) {
+
+        if (orders == null) {
+
+            orders = new ArrayList<>();
+
+        }
+
+        orders.add(order);
 
     }
 

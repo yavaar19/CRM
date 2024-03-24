@@ -41,7 +41,7 @@ class CustomerServiceTest {
     void setUp() {
 
         jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
-                + "VALUES(1, 'Nuzhah', 'Peerally', 'nuzhah@gmail.com', '1990-10-17')");
+                + "VALUES(1, 'John', 'Doe', 'john@gmail.com', '1987-09-03')");
 
     }
 
@@ -57,7 +57,7 @@ class CustomerServiceTest {
     @Test
     void canSaveCustomer() {
 
-        Customer customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
+        Customer customer = new Customer("John", "Doe","john@gmail.com" , LocalDate.of(1987, 9, 3));
 
         Customer savedCustomer = customerService.saveCustomer(customer);
 
@@ -79,11 +79,11 @@ class CustomerServiceTest {
     void canFindAllCustomers() {
 
         jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
-                + "VALUES(2, 'Yavaar', 'Nosimohomed', 'yavaar@gmail.com', '1912-11-11')");
+                + "VALUES(2, 'Will', 'Smith', 'smith@gmailgmail.com', '1912-11-11')");
         jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
                 + "VALUES(3, 'Varun', 'Pandit', 'varun@gmail.com', '19952-03-10')");
         jdbc.execute("INSERT INTO CUSTOMER(ID, FIRST_NAME, LAST_NAME, EMAIL, DATE_OF_BIRTH)"
-                + "VALUES(4, 'Shahaad', 'Nosi', 'shahaad@gmail.com', '1990-05-03')");
+                + "VALUES(4, 'Azhar', 'Nosi', 'azhar@gmail.com', '1990-05-03')");
 
         List<Customer> customers = customerService.findAllCustomers();
 
@@ -96,13 +96,13 @@ class CustomerServiceTest {
 
         Optional<Customer> foundCustomer = customerService.findCustomerById(1);
 
-        foundCustomer.get().setLastName("Nosimohomed");
+        foundCustomer.get().setLastName("Smith");
 
         customerService.updateCustomer(foundCustomer.get());
 
         Optional<Customer> updatedCustomer = customerService.findCustomerById(1);
 
-        assertEquals("Nosimohomed", updatedCustomer.get().getLastName());
+        assertEquals("Smith", updatedCustomer.get().getLastName());
 
     }
 
@@ -120,8 +120,8 @@ class CustomerServiceTest {
     @Test
     void canFindCustomerByIdJoinFetchAddress() {
 
-        Address address = new Address(58, "Windsor Road", "Etobicoke", "ON", "M9R-3G5");
-        Customer customer = new Customer("Nuzhah", "Peerally","nuzhah@gmail.com" , LocalDate.of(1990, 10, 17));
+        Address address = new Address(58, "Luka Road", "Bradford", "ON", "L4R-S5G");
+        Customer customer = new Customer("John", "Doe","john@gmail.com" , LocalDate.of(1990, 10, 17));
 
         customer.addAddress(address);
         Customer savedCustomer = customerService.saveCustomer(customer);

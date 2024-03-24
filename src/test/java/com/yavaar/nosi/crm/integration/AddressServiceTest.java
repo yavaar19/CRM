@@ -41,7 +41,7 @@ class AddressServiceTest {
     void setUp() {
 
         jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
-                + "VALUES(1, 58, 'Windsor Road', 'Etobicoke', 'ON', 'M9R-3G5')");
+                + "VALUES(1, 100, 'Cedar Lane', 'Bradford', 'ON', 'L9H-D1T')");
 
     }
 
@@ -57,7 +57,7 @@ class AddressServiceTest {
     @Test
     void canSaveAddress() {
 
-        Address address = new Address(58, "Windsor Road","Etobicoke" , "ON", "M9R-3G5");
+        Address address = new Address(100, "Cedar Lane","Bradford" , "ON", "L9H-D1T");
 
         Address savedAddress = addressService.saveAddress(address);
         Address foundAddress = addressService.findAddressById(savedAddress.getId()).get();
@@ -79,11 +79,11 @@ class AddressServiceTest {
     void canFindAllAddresses() {
 
         jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
-                + "VALUES(2, 380, 'Dixon Road', 'Etobicoke', 'ON', 'M9R-1T3')");
+                + "VALUES(2, 48, 'Luda Road', 'Bradford', 'ON', 'M9R-1T3')");
         jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
-                + "VALUES(3, 1735, 'Kipling Ave', 'Etobicoke', 'ON', 'M9R-4H6')");
+                + "VALUES(3, 1735, 'Kipling Ave', 'Bradford', 'ON', 'M9R-4H6')");
         jdbc.execute("INSERT INTO ADDRESS(ID, STREET_NUMBER, STREET_NAME, CITY, PROVINCE, POSTAL_CODE)"
-                + "VALUES(4, 95, 'Islington Ave', 'Etobicoke', 'ON', 'M9R-8J7')");
+                + "VALUES(4, 95, 'Islington Ave', 'Bradford', 'ON', 'M9R-8J7')");
 
         List<Address> foundAddresses = addressService.findAllAddresses();
 
@@ -96,7 +96,7 @@ class AddressServiceTest {
 
         Optional<Address> foundAddress = addressService.findAddressById(1);
 
-        assertEquals(58, foundAddress.get().getStreetNumber());
+        assertEquals(100, foundAddress.get().getStreetNumber());
 
         foundAddress.get().setStreetNumber(100);
 
@@ -124,8 +124,8 @@ class AddressServiceTest {
     @Test
     void canFindAddressByIdJoinFetchCustomer() {
 
-        Address address = new Address(58, "Windsor Road","Etobicoke" , "ON", "M9R-3G5");
-        Customer customer = new Customer("Yavaar", "Nosimohomed", "yavaar@gmail.com", LocalDate.of(1989, 10, 01));
+        Address address = new Address(100, "Cedar Lane","Bradford" , "ON", "L9H-D1T");
+        Customer customer = new Customer("Varun", "Pandit", "pandit@gmail.com", LocalDate.of(1989, 10, 01));
         address.addCustomer(customer);
         Address savedAddress = addressService.saveAddress(address);
 
