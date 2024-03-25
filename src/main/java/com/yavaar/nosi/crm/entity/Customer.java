@@ -1,6 +1,7 @@
 package com.yavaar.nosi.crm.entity;
 
 import jakarta.persistence.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class Customer {
     private String email;
     @Column(name = "date_of_birth")
     private LocalDate dob;
+
 
     @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
     @JoinTable(
@@ -122,6 +124,8 @@ public class Customer {
         }
 
         orders.add(order);
+
+        order.setCustomer(this);
 
     }
 

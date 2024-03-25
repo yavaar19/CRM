@@ -7,7 +7,11 @@ import java.util.Optional;
 
 public interface OrderService {
     Order saveOrder(Order order);
-    Optional<Order> findOrderById(Long id);
+    Optional<Order> findOrderById(long id);
     List<Order> findAllOrders();
+    void saveAllOrders(List<Order> orders);
+    void updateOrder(Order order);
+    void deleteOrderById(long id);
+    boolean checkIfStudentIsNull(long id);
 
 }
