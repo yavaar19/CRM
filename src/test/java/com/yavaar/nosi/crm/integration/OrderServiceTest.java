@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,9 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("/application-test.properties")
 class OrderServiceTest {
 
-    @Autowired
-    private JdbcTemplate jdbc;
-
     @Value("${sql.script.delete.order}")
     private String SQLDELETECUSTOMERORDER;
 
@@ -37,6 +33,9 @@ class OrderServiceTest {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     Order order;
 
     Customer customer;
@@ -44,46 +43,48 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
 
-        customer = new Customer("John", "Doe","john@gmail.com",
-                LocalDate.of(1987, 9, 3));
-        order = new Order(LocalDate.of(2024, 01,02), new BigDecimal("100.00"),
-                new BigDecimal("20.00"), new BigDecimal("120.00"));
+        customer = new Customer("Terry", "Taylor","taylor@gmail.com" , LocalDate.of(1983, 11, 1));
+        order = new Order(LocalDate.of(2023, 12,11), new BigDecimal("200.00"),
+                new BigDecimal("40.00"), new BigDecimal("240.00"));
 
     }
 
     @Test
     void canSaveOrder() {
 
-        Order order1 = new Order(LocalDate.of(2023, 12,11), new BigDecimal("200.00"),
-                new BigDecimal("40.00"), new BigDecimal("240.00"));
-        Order order2 = new Order(LocalDate.of(2022, 9,01), new BigDecimal("300.00"),
-                new BigDecimal("60.00"), new BigDecimal("360.00"));
+        customer.addOrder(order);
 
-        order.setCustomer(customer);
-        order1.setCustomer(customer);
-        order2.setCustomer(customer);
+        Order savedOrder = orderService.saveOrder(order);
 
-        orderService.saveAllOrders(List.of(order, order1, order2));
+        Order updatedOrder = orderService.findOrderById(savedOrder.getId()).get();
 
-        List<Order> orders = orderService.findAllOrders();
-
-        assertEquals(3, orders.size());
+        assertEquals(savedOrder, updatedOrder);
 
     }
 
     @Test
     void canSaveAllOrders() {
 
-        Order savedOrder = orderService.saveOrder(order);
+        Order order1 = new Order(LocalDate.of(2023, 12,11), new BigDecimal("400.00"),
+                new BigDecimal("80.00"), new BigDecimal("480.00"));
+        Order order2 = new Order(LocalDate.of(2022, 9,01), new BigDecimal("300.00"),
+                new BigDecimal("60.00"), new BigDecimal("360.00"));
 
-        Order foundOrder = orderService.findOrderById(savedOrder.getId()).get();
+        customer.addOrder(order1);
+        customer.addOrder(order2);
 
-        assertEquals(savedOrder, foundOrder);
+        orderService.saveAllOrders(List.of(order1, order2));
+
+        List<Order> foundOrder = orderService.findAllOrders();
+
+        assertEquals(2, foundOrder.size());
 
     }
 
     @Test
     void canFindOrder() {
+
+        customer.addOrder(order);
 
         Order savedOrder = orderService.saveOrder(order);
 
@@ -116,7 +117,7 @@ class OrderServiceTest {
     @Test
     void canUpdateOrder() {
 
-        order.setCustomer(customer);
+        customer.addOrder(order);
         Order savedOrder = orderService.saveOrder(order);
         Order foundOrder = orderService.findOrderById(savedOrder.getId()).get();
 
@@ -133,7 +134,7 @@ class OrderServiceTest {
     @Test
     void canDeleteOrder() {
 
-        order.setCustomer(customer);
+        customer.addOrder(order);
         Order savedOrder = orderService.saveOrder(order);
 
         assertTrue(orderService.findOrderById(savedOrder.getId()).isPresent());
@@ -147,6 +148,7 @@ class OrderServiceTest {
     @Test
     void canFindOrderAndCustomerEager() {
 
+        customer.addOrder(order);
         Order savedOrder = orderService.saveOrder(order);
         Order foundOrder = orderService.findOrderById(savedOrder.getId()).get();
 
@@ -157,7 +159,7 @@ class OrderServiceTest {
     @Test
     void isOrderNullCheck() {
 
-        order.setCustomer(customer);
+        customer.addOrder(order);
         Order savedOrder = orderService.saveOrder(order);
 
         assertFalse(orderService.checkIfStudentIsNull(savedOrder.getId()));
