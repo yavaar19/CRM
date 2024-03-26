@@ -3,6 +3,7 @@ package com.yavaar.nosi.crm.integration;
 
 import com.yavaar.nosi.crm.entity.Customer;
 import com.yavaar.nosi.crm.entity.Order;
+import com.yavaar.nosi.crm.entity.PaymentType;
 import com.yavaar.nosi.crm.service.CustomerService;
 import com.yavaar.nosi.crm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
@@ -45,7 +46,7 @@ class OrderServiceTest {
 
         customer = new Customer("Terry", "Taylor","taylor@gmail.com" , LocalDate.of(1983, 11, 1));
         order = new Order(LocalDate.of(2023, 12,11), new BigDecimal("200.00"),
-                new BigDecimal("40.00"), new BigDecimal("240.00"));
+                new BigDecimal("40.00"), new BigDecimal("240.00"), PaymentType.AMERICAN_EXPRESS);
 
     }
 
@@ -66,9 +67,9 @@ class OrderServiceTest {
     void canSaveAllOrders() {
 
         Order order1 = new Order(LocalDate.of(2023, 12,11), new BigDecimal("400.00"),
-                new BigDecimal("80.00"), new BigDecimal("480.00"));
+                new BigDecimal("80.00"), new BigDecimal("480.00"), PaymentType.CASH);
         Order order2 = new Order(LocalDate.of(2022, 9,01), new BigDecimal("300.00"),
-                new BigDecimal("60.00"), new BigDecimal("360.00"));
+                new BigDecimal("60.00"), new BigDecimal("360.00"), PaymentType.CHEQUE);
 
         customer.addOrder(order1);
         customer.addOrder(order2);
@@ -98,9 +99,9 @@ class OrderServiceTest {
     void canFindAllOrders() {
 
         Order order1 = new Order(LocalDate.of(2023, 12,11), new BigDecimal("200.00"),
-                new BigDecimal("40.00"), new BigDecimal("240.00"));
+                new BigDecimal("40.00"), new BigDecimal("240.00"), PaymentType.DEBIT);
         Order order2 = new Order(LocalDate.of(2022, 9,01), new BigDecimal("300.00"),
-                new BigDecimal("60.00"), new BigDecimal("360.00"));
+                new BigDecimal("60.00"), new BigDecimal("360.00"), PaymentType.MASTERCARD);
 
         customer.addOrder(order);
         customer.addOrder(order1);

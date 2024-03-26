@@ -31,15 +31,18 @@ public class Order {
     private BigDecimal taxAmount;
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 
     public Order() {
     }
 
-    public Order(LocalDate orderDate, BigDecimal orderAmount, BigDecimal taxAmount, BigDecimal totalAmount) {
+    public Order(LocalDate orderDate, BigDecimal orderAmount, BigDecimal taxAmount, BigDecimal totalAmount, PaymentType paymentType) {
         this.orderDate = orderDate;
         this.orderAmount = orderAmount;
         this.taxAmount = taxAmount;
         this.totalAmount = totalAmount;
+        this.paymentType = paymentType;
     }
 
     public Long getId() {
@@ -90,16 +93,24 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id) && Objects.equals(orderDate, order.orderDate) && Objects.equals(orderAmount, order.orderAmount) && Objects.equals(taxAmount, order.taxAmount) && Objects.equals(totalAmount, order.totalAmount);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Order order)) return false;
+        return Objects.equals(id, order.id) && Objects.equals(orderDate, order.orderDate) && Objects.equals(orderAmount, order.orderAmount) && Objects.equals(taxAmount, order.taxAmount) && Objects.equals(totalAmount, order.totalAmount) && paymentType == order.paymentType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orderDate, orderAmount, taxAmount, totalAmount);
+        return Objects.hash(id, orderDate, orderAmount, taxAmount, totalAmount, paymentType);
     }
 
     @Override
@@ -110,6 +121,7 @@ public class Order {
                 ", orderAmount=" + orderAmount +
                 ", taxAmount=" + taxAmount +
                 ", totalAmount=" + totalAmount +
+                ", paymentType=" + paymentType +
                 '}';
     }
 
