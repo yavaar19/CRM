@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "customer")
@@ -32,7 +30,7 @@ public class Customer {
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id")
     )
-    private List<Address> addresses;
+    private Set<Address> addresses;
 
     @OneToMany(mappedBy = "customer", cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH}, fetch = FetchType.LAZY)
     private List<Order> orders;
@@ -87,11 +85,11 @@ public class Customer {
         this.dob = dob;
     }
 
-    public List<Address> getAddresses() {
+    public Set<Address> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(Set<Address> addresses) {
         this.addresses = addresses;
     }
 
@@ -107,7 +105,7 @@ public class Customer {
 
         if (addresses == null) {
 
-            addresses = new ArrayList<>();
+            addresses = new HashSet<>();
 
         }
 

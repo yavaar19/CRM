@@ -13,6 +13,7 @@ public interface CustomerService {
     void deleteCustomerById(long id);
     List<Customer> findAllCustomers();
     Customer findCustomerByIdJoinFetchAddress(long id);
-    boolean checkIfStudentIsNull(long i);
+    boolean checkIfCustomerIsNull(long i);
+    Customer findCustomerByIdJoinFetchOrder(long id);
 
 }

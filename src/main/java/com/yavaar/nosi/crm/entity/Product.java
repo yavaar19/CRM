@@ -3,7 +3,9 @@ package com.yavaar.nosi.crm.entity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "product")
@@ -23,6 +25,9 @@ public class Product {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<OrderDetail> orderDetails;
 
     public Product() {
     }
@@ -83,6 +88,27 @@ public class Product {
         this.status = status;
     }
 
+    public Set<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(Set<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public void addOrderProduct(OrderDetail orderDetail) {
+
+        if (orderDetails == null) {
+
+            orderDetails = new HashSet<>();
+
+        }
+
+        orderDetails.add(orderDetail);
+
+        orderDetail.setProduct(this);
+
+    }
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;

@@ -2,6 +2,8 @@ package com.yavaar.nosi.crm.integration;
 
 import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
+import com.yavaar.nosi.crm.entity.Order;
+import com.yavaar.nosi.crm.entity.PaymentType;
 import com.yavaar.nosi.crm.service.CustomerService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +40,9 @@ class CustomerServiceTest {
     @Value("${sql.script.delete.customer_address}")
     private String SQLDELETECUSTOMERADDRESS;
 
+    @Value("${sql.script.delete.order}")
+    private String SQLDELETECUSTOMERORDER;
+
     @BeforeEach
     void setUp() {
 
@@ -49,6 +55,7 @@ class CustomerServiceTest {
     void cleanUpDatabase() {
 
         jdbc.execute(SQLDELETECUSTOMERADDRESS);
+        jdbc.execute(SQLDELETECUSTOMERORDER);
         jdbc.execute(SQLDELETECUSTOMER);
         jdbc.execute(SQLDELETEADDRESS);
 
@@ -133,10 +140,30 @@ class CustomerServiceTest {
     }
 
     @Test
+    void canFindCustomerByIdJoinFetchOrder() {
+
+        Order order1 = new Order(LocalDate.of(2023, 2, 5), new BigDecimal("200.00"), new BigDecimal("40.00"), new BigDecimal("240.00"), PaymentType.MASTERCARD);
+        Order order2 = new Order(LocalDate.of(2021, 8, 25), new BigDecimal("100.00"), new BigDecimal("20.00"), new BigDecimal("120.00"), PaymentType.AMERICAN_EXPRESS);
+        Customer customer = new Customer("John", "Doe","john@gmail.com" , LocalDate.of(1990, 10, 17));
+
+        customer.addOrder(order1);
+        customer.addOrder(order2);
+
+        Customer savedCustomer = customerService.saveCustomer(customer);
+
+        Customer foundCustomer = customerService.findCustomerByIdJoinFetchOrder(savedCustomer.getId());
+
+        System.out.println(foundCustomer.getOrders());
+
+        assertFalse(foundCustomer.getOrders().isEmpty());
+
+    }
+
+    @Test
     void isCustomerNullCheck() {
 
-        assertFalse(customerService.checkIfStudentIsNull(1));
-        assertTrue(customerService.checkIfStudentIsNull(0));
+        assertFalse(customerService.checkIfCustomerIsNull(1));
+        assertTrue(customerService.checkIfCustomerIsNull(0));
 
     }
 

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "customerorder")
@@ -23,6 +25,10 @@ public class Order {
             }
     )
     private Customer customer;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<OrderDetail> orderDetails;
+
     @Column(name = "order_date")
     private LocalDate orderDate;
     @Column(name = "order_amount")
@@ -99,6 +105,28 @@ public class Order {
 
     public void setPaymentType(PaymentType paymentType) {
         this.paymentType = paymentType;
+    }
+
+    public Set<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(Set<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public void addOrderDetail(OrderDetail orderDetail) {
+
+        if (orderDetails == null) {
+
+            orderDetails = new HashSet<>();
+
+        }
+
+        orderDetails.add(orderDetail);
+
+        orderDetail.setOrder(this);
+
     }
 
     @Override

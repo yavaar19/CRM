@@ -54,6 +54,13 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    public Order findOrderByIdJoinFetchOrderDetail(long id) {
+
+        return orderDao.findOrderByIdJoinFetchOrderDetail(id);
+
+    }
+
+    @Override
     public Optional<Order> findOrderById(long id) {
 
         return orderDao.findById(id);

@@ -57,11 +57,19 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public boolean checkIfStudentIsNull(long id) {
+    public boolean checkIfCustomerIsNull(long id) {
 
         Optional<Customer> customer = findCustomerById(id);
 
         return customer.isEmpty();
+
+    }
+
+    @Override
+    public Customer findCustomerByIdJoinFetchOrder(long id) {
+
+        return customerDao.findCustomerByIdJoinFetchOrder(id);
+
 
     }
 

@@ -1,10 +1,7 @@
 package com.yavaar.nosi.crm.integration;
 
 
-import com.yavaar.nosi.crm.entity.Customer;
-import com.yavaar.nosi.crm.entity.Order;
-import com.yavaar.nosi.crm.entity.PaymentType;
-import com.yavaar.nosi.crm.service.CustomerService;
+import com.yavaar.nosi.crm.entity.*;
 import com.yavaar.nosi.crm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +27,9 @@ class OrderServiceTest {
 
     @Value("${sql.script.delete.customer}")
     private String SQLDELETECUSTOMER;
+
+    @Value("${sql.script.delete.orderdetails}")
+    private String SQLDELETEORDERDETAILS;
 
     @Autowired
     private OrderService orderService;
@@ -158,6 +158,22 @@ class OrderServiceTest {
     }
 
     @Test
+    void canFindOrderByIdJoinFetchOrderDetail() {
+
+        OrderDetail orderDetail = new OrderDetail(new Product(), 1, new BigDecimal("100"));
+        OrderDetail orderDetail2 = new OrderDetail(new Product(), 2, new BigDecimal("300"));
+
+        order.addOrderDetail(orderDetail);
+        order.addOrderDetail(orderDetail2);
+
+        Order savedOrder = orderService.saveOrder(order);
+        Order foundOrder = orderService.findOrderByIdJoinFetchOrderDetail(savedOrder.getId());
+
+        assertEquals(2, foundOrder.getOrderDetails().size());
+
+    }
+
+    @Test
     void isOrderNullCheck() {
 
         customer.addOrder(order);
@@ -171,6 +187,7 @@ class OrderServiceTest {
     @AfterEach
     void cleanUpDatabase() {
 
+        jdbc.execute(SQLDELETEORDERDETAILS);
         jdbc.execute(SQLDELETECUSTOMERORDER);
         jdbc.execute(SQLDELETECUSTOMER);
 
