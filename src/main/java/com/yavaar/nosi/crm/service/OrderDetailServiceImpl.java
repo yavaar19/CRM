@@ -15,16 +15,16 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private OrderServiceDetailDao orderServiceDetailDao;
 
     @Override
-    public Optional <OrderDetail> findOrderDetailById(long id) {
+    public OrderDetail saveOrderDetail(OrderDetail orderDetail) {
 
-        return orderServiceDetailDao.findById(id);
+        return orderServiceDetailDao.save(orderDetail);
 
     }
 
     @Override
-    public OrderDetail saveOrderDetail(OrderDetail orderDetail) {
+    public Optional <OrderDetail> findOrderDetailById(long id) {
 
-        return orderServiceDetailDao.save(orderDetail);
+        return orderServiceDetailDao.findById(id);
 
     }
 
