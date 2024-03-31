@@ -88,7 +88,7 @@ class OrderServiceTest {
 
         when(orderDao.findById(1L)).thenReturn(Optional.ofNullable(order));
 
-        assertFalse(orderService.checkIfStudentIsNull(1L));
+        assertFalse(orderService.checkIfOrderIsNull(1L));
 
         verify(orderDao, times(1)).findById(1L);
 
@@ -97,9 +97,9 @@ class OrderServiceTest {
     @Test
     void findOrderByIdJoinFetchOrderDetailTest() {
 
-        when(orderDao.findOrderByIdJoinFetchOrderDetail(1L)).thenReturn(order);
+        when(orderDao.findOrderByIdJoinFetchOrderDetail(1L)).thenReturn(Optional.ofNullable(order));
 
-        assertEquals(order, orderService.findOrderByIdJoinFetchOrderDetail(1L));
+        assertEquals(order, orderService.findOrderByIdJoinFetchOrderDetail(1L).get());
 
         verify(orderDao, times(1)).findOrderByIdJoinFetchOrderDetail(1L);
 

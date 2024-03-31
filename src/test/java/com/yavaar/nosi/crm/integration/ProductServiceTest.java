@@ -102,9 +102,7 @@ class ProductServiceTest {
 
         productService.deleteProductById(10);
 
-        Optional<Product> deletedProduct = productService.findProductById(10);
-
-        assertFalse(deletedProduct.isPresent());
+        assertTrue(productService.checkIfProductIsNull(10L));
 
     }
 

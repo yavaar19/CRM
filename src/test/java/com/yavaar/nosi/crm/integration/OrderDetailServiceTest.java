@@ -3,6 +3,7 @@ package com.yavaar.nosi.crm.integration;
 
 import com.yavaar.nosi.crm.entity.*;
 import com.yavaar.nosi.crm.entity.Order;
+import com.yavaar.nosi.crm.exception.OrderDetailNotFoundException;
 import com.yavaar.nosi.crm.service.OrderDetailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,9 +142,7 @@ class OrderDetailServiceTest {
 
         orderDetailService.deleteOrderDetailById(saveOrderDetail.getId());
 
-        Optional<OrderDetail> deletedOrderDetail = orderDetailService.findOrderDetailById(saveOrderDetail.getId());
-
-        assertTrue(deletedOrderDetail.isEmpty());
+        assertTrue(orderDetailService.checkIfOrderDetailIsNull(saveOrderDetail.getId()));
 
     }
 
@@ -157,6 +156,19 @@ class OrderDetailServiceTest {
 
         assertFalse(orderDetailService.checkIfOrderDetailIsNull(saveOrderDetail.getId()));
         assertTrue(orderDetailService.checkIfOrderDetailIsNull(0));
+
+    }
+
+    @Test
+    void orderDetailNotFoundException() {
+
+        Exception exception = assertThrows(OrderDetailNotFoundException.class, () -> {
+
+            orderDetailService.findOrderDetailById(100);
+
+        });
+
+        assertEquals("Order detail does not exist!", exception.getMessage());
 
     }
 

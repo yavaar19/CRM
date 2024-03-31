@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.integration;
 
 import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
+import com.yavaar.nosi.crm.exception.AddressNotFoundException;
 import com.yavaar.nosi.crm.service.AddressService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -115,9 +116,7 @@ class AddressServiceTest {
 
         addressService.deleteAddressById(1);
 
-        Optional<Address> foundAddress = addressService.findAddressById(1);
-
-        assertTrue(foundAddress.isEmpty());
+        assertTrue(addressService.checkIfAddressIsNull(1));
 
     }
 
@@ -129,7 +128,7 @@ class AddressServiceTest {
         address.addCustomer(customer);
         Address savedAddress = addressService.saveAddress(address);
 
-        Address foundAddress = addressService.findAddressByIdJoinFetchCustomer(savedAddress.getId());
+        Address foundAddress = addressService.findAddressByIdJoinFetchCustomer(savedAddress.getId()).get();
 
         assertFalse(foundAddress.getCustomers().isEmpty());
 
@@ -140,7 +139,21 @@ class AddressServiceTest {
     void isAddressNullCheck() {
 
         assertFalse(addressService.checkIfAddressIsNull(1));
+
         assertTrue(addressService.checkIfAddressIsNull(0));
+
+    }
+
+    @Test
+    void addressNotFoundException() {
+
+        Exception exception = assertThrows(AddressNotFoundException.class, () -> {
+
+            addressService.findAddressById(100);
+
+        });
+
+        assertEquals("Address does not exist!", exception.getMessage());
 
     }
 

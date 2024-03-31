@@ -4,6 +4,7 @@ import com.yavaar.nosi.crm.entity.Address;
 import com.yavaar.nosi.crm.entity.Customer;
 import com.yavaar.nosi.crm.entity.Order;
 import com.yavaar.nosi.crm.entity.PaymentType;
+import com.yavaar.nosi.crm.exception.CustomerNotFoundException;
 import com.yavaar.nosi.crm.service.CustomerService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,14 +114,17 @@ class CustomerServiceTest {
 
     }
 
-    @Test
+    @Test()
     void canDeleteCustomer() {
 
         assertTrue(customerService.findCustomerById(1).isPresent());
 
         customerService.deleteCustomerById(1);
 
-        assertFalse(customerService.findCustomerById(1).isPresent());
+        Exception exception = assertThrows(CustomerNotFoundException.class, () ->
+                customerService.findCustomerById(1).isPresent());
+
+        assertEquals("Customer does not exist!", exception.getMessage());
 
     }
 
@@ -133,7 +137,7 @@ class CustomerServiceTest {
         customer.addAddress(address);
         Customer savedCustomer = customerService.saveCustomer(customer);
 
-        Customer foundCustomer = customerService.findCustomerByIdJoinFetchAddress(savedCustomer.getId());
+        Customer foundCustomer = customerService.findCustomerByIdJoinFetchAddress(savedCustomer.getId()).get();
 
         assertFalse(foundCustomer.getAddresses().isEmpty());
 
@@ -151,7 +155,7 @@ class CustomerServiceTest {
 
         Customer savedCustomer = customerService.saveCustomer(customer);
 
-        Customer foundCustomer = customerService.findCustomerByIdJoinFetchOrder(savedCustomer.getId());
+        Customer foundCustomer = customerService.findCustomerByIdJoinFetchOrder(savedCustomer.getId()).get();
 
         System.out.println(foundCustomer.getOrders());
 
@@ -160,10 +164,53 @@ class CustomerServiceTest {
     }
 
     @Test
+    void canFindAllCustomersJoinFetchAddress() {
+
+        Address address1 = new Address(58, "Luka Road", "Bradford", "ON", "L4R-S5G");
+        Address address2 = new Address(58, "George Street", "Deliote", "WA", "U4V-K5G");
+        Customer customer1 = new Customer("John", "Doe","john@gmail.com" , LocalDate.of(1990, 10, 17));
+        Customer customer2 = new Customer("Emily", "Tanner","emily@gmail.com" , LocalDate.of(1985, 9, 4));
+
+        customer1.addAddress(address1);
+        customer2.addAddress(address2);
+        customerService.saveCustomer(customer1);
+        customerService.saveCustomer(customer2);
+
+        List<Customer> foundCustomer = customerService.findAllCustomersJoinFetchAddress();
+
+        assertEquals(2, foundCustomer.size());
+
+    }
+
+    @Test
+    void canFindCustomerByEmail() {
+
+        Optional<Customer> foundCustomer = customerService.findCustomerByEmailAddress("john@gmail.com");
+
+        assertTrue(foundCustomer.isPresent());
+
+    }
+
+    @Test
     void isCustomerNullCheck() {
 
         assertFalse(customerService.checkIfCustomerIsNull(1));
+
         assertTrue(customerService.checkIfCustomerIsNull(0));
+
+
+    }
+
+    @Test
+    void customerNotFoundException() {
+
+        Exception exception = assertThrows(CustomerNotFoundException.class, () -> {
+
+            customerService.findCustomerById(100);
+
+        });
+
+        assertEquals("Customer does not exist!", exception.getMessage());
 
     }
 

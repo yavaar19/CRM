@@ -12,7 +12,7 @@ public interface OrderService {
     void saveAllOrders(List<Order> orders);
     void updateOrder(Order order);
     void deleteOrderById(long id);
-    boolean checkIfStudentIsNull(long id);
-    Order findOrderByIdJoinFetchOrderDetail(long id);
+    boolean checkIfOrderIsNull(long id);
+    Optional<Order> findOrderByIdJoinFetchOrderDetail(long id);
 
 }

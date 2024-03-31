@@ -92,9 +92,9 @@ class AddressServiceTest {
     @Test
     void findAddressByIdJoinFetchCustomerTest() {
 
-        when(addressDao.findAddressByIdJoinFetchCustomer(1L)).thenReturn(address);
+        when(addressDao.findAddressByIdJoinFetchCustomer(1L)).thenReturn(Optional.ofNullable(address));
 
-        assertEquals(address, addressService.findAddressByIdJoinFetchCustomer(1L));
+        assertEquals(address, addressService.findAddressByIdJoinFetchCustomer(1L).get());
 
         verify(addressDao, times(1)).findAddressByIdJoinFetchCustomer(1L);
 

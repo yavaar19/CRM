@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.service;
 
 import com.yavaar.nosi.crm.dao.OrderDao;
 import com.yavaar.nosi.crm.entity.Order;
+import com.yavaar.nosi.crm.exception.OrderNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,25 +46,41 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public boolean checkIfStudentIsNull(long id) {
+    public boolean checkIfOrderIsNull(long id) {
 
-        Optional<Order> order = findOrderById(id);
+        Optional<Order> order = orderDao.findById(id);
 
         return order.isEmpty();
 
     }
 
     @Override
-    public Order findOrderByIdJoinFetchOrderDetail(long id) {
+    public Optional<Order> findOrderByIdJoinFetchOrderDetail(long id) {
 
-        return orderDao.findOrderByIdJoinFetchOrderDetail(id);
+        Optional<Order> order = orderDao.findOrderByIdJoinFetchOrderDetail(id);
+
+        if (order.isEmpty()) {
+
+            order = orderDao.findById(id);
+
+        }
+
+        return order;
 
     }
 
     @Override
     public Optional<Order> findOrderById(long id) {
 
-        return orderDao.findById(id);
+        Optional<Order> order = orderDao.findById(id);
+
+        if (order.isEmpty()) {
+
+            throw new OrderNotFoundException("Order does not exist!");
+
+        }
+
+        return order;
 
     }
 

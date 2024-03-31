@@ -11,7 +11,7 @@ public interface AddressService {
     Optional<Address> findAddressById(long id);
     void deleteAddressById(long id);
     List<Address> findAllAddresses();
-    Address findAddressByIdJoinFetchCustomer(long id);
+    Optional<Address> findAddressByIdJoinFetchCustomer(long id);
     boolean checkIfAddressIsNull(long id);
 
 }
