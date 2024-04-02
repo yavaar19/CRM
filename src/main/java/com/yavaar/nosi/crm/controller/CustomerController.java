@@ -29,7 +29,7 @@ public class CustomerController {
     @PostMapping("/customers")
     public String createCustomer(@ModelAttribute("customer") Customer customer, @ModelAttribute("address") Address address, Model m) {
 
-        // NEED TO IMPLEMENT OBJECT NULL CHECKS LATER ON
+        // NEED TO IMPLEMENT OBJECT NULL AND ERROR CHECKS LATER ON
 
         customer.addAddress(address);
 
@@ -38,7 +38,7 @@ public class CustomerController {
         List<Customer> customerList = customerService.findAllCustomersJoinFetchAddress();
         m.addAttribute("customers", customerList);
 
-        return "customers";
+        return "redirect:customers";
 
     }
 
