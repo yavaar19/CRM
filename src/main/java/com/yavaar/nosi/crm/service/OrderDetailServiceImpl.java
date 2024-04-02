@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.service;
 
 import com.yavaar.nosi.crm.dao.OrderServiceDetailDao;
 import com.yavaar.nosi.crm.entity.OrderDetail;
+import com.yavaar.nosi.crm.exception.OrderDetailNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,15 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public Optional <OrderDetail> findOrderDetailById(long id) {
 
-        return orderServiceDetailDao.findById(id);
+        Optional<OrderDetail> orderDetail = orderServiceDetailDao.findById(id);
+
+        if (orderDetail.isEmpty()) {
+
+            throw new OrderDetailNotFoundException("Order detail does not exist!");
+
+        }
+
+        return orderDetail;
 
     }
 
@@ -59,7 +68,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public boolean checkIfOrderDetailIsNull(long id) {
 
-        Optional<OrderDetail> orderDetail = findOrderDetailById(id);
+        Optional<OrderDetail> orderDetail = orderServiceDetailDao.findById(id);
 
         return orderDetail.isEmpty();
 

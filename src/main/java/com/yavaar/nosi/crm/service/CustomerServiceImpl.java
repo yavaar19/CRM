@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.service;
 
 import com.yavaar.nosi.crm.dao.CustomerDao;
 import com.yavaar.nosi.crm.entity.Customer;
+import com.yavaar.nosi.crm.exception.CustomerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,17 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Optional <Customer> findCustomerById(long id) {
+    public Optional<Customer> findCustomerById(long id) {
 
-        return customerDao.findById(id);
+        Optional<Customer> customer = customerDao.findById(id);
+
+        if (customer.isEmpty()) {
+
+            throw new CustomerNotFoundException("Customer does not exist!");
+
+        }
+
+        return customer;
 
     }
 
@@ -50,26 +59,63 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Customer findCustomerByIdJoinFetchAddress(long id) {
+    public Optional<Customer> findCustomerByIdJoinFetchAddress(long id) {
 
-        return customerDao.findCustomerByIdJoinFetchAddress(id);
+        Optional<Customer> customer = customerDao.findCustomerByIdJoinFetchAddress(id);
+
+        if (customer.isEmpty()) {
+
+            customer = customerDao.findById(id);
+
+        }
+
+        return customer;
+
+    }
+
+    @Override
+    public Optional<Customer> findCustomerByIdJoinFetchOrder(long id) {
+
+        Optional<Customer> customer = customerDao.findCustomerByIdJoinFetchOrder(id);
+
+        if (customer.isEmpty()) {
+
+            customer = customerDao.findById(id);
+
+        }
+
+        return customer;
 
     }
 
     @Override
     public boolean checkIfCustomerIsNull(long id) {
 
-        Optional<Customer> customer = findCustomerById(id);
+        Optional<Customer> customer = customerDao.findById(id);
 
         return customer.isEmpty();
 
     }
 
     @Override
-    public Customer findCustomerByIdJoinFetchOrder(long id) {
+    public Optional<Customer> findCustomerByEmailAddress(String email) {
 
-        return customerDao.findCustomerByIdJoinFetchOrder(id);
+        Optional<Customer> customer = customerDao.findCustomerByEmail(email);
 
+        if (customer.isEmpty()) {
+
+            throw new CustomerNotFoundException("Customer does not exist!");
+
+        }
+
+        return customer;
+
+    }
+
+    @Override
+    public List<Customer> findAllCustomersJoinFetchAddress() {
+
+        return customerDao.canFindAllCustomersJoinFetchAddress();
 
     }
 

@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.integration;
 
 
 import com.yavaar.nosi.crm.entity.*;
+import com.yavaar.nosi.crm.exception.OrderNotFoundException;
 import com.yavaar.nosi.crm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,7 +143,7 @@ class OrderServiceTest {
 
         orderService.deleteOrderById(savedOrder.getId());
 
-        assertFalse(orderService.findOrderById(savedOrder.getId()).isPresent());
+        assertTrue(orderService.checkIfOrderIsNull(savedOrder.getId()));
 
     }
 
@@ -167,7 +168,7 @@ class OrderServiceTest {
         order.addOrderDetail(orderDetail2);
 
         Order savedOrder = orderService.saveOrder(order);
-        Order foundOrder = orderService.findOrderByIdJoinFetchOrderDetail(savedOrder.getId());
+        Order foundOrder = orderService.findOrderByIdJoinFetchOrderDetail(savedOrder.getId()).get();
 
         assertEquals(2, foundOrder.getOrderDetails().size());
 
@@ -179,8 +180,21 @@ class OrderServiceTest {
         customer.addOrder(order);
         Order savedOrder = orderService.saveOrder(order);
 
-        assertFalse(orderService.checkIfStudentIsNull(savedOrder.getId()));
-        assertTrue(orderService.checkIfStudentIsNull(0));
+        assertFalse(orderService.checkIfOrderIsNull(savedOrder.getId()));
+        assertTrue(orderService.checkIfOrderIsNull(0));
+
+    }
+
+    @Test
+    void orderNotFoundException() {
+
+        Exception exception = assertThrows(OrderNotFoundException.class, () -> {
+
+            orderService.findOrderById(100);
+
+        });
+
+        assertEquals("Order does not exist!", exception.getMessage());
 
     }
 

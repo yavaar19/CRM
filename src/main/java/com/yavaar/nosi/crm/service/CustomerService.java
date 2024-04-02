@@ -12,8 +12,10 @@ public interface CustomerService {
     void updateCustomer(Customer customer);
     void deleteCustomerById(long id);
     List<Customer> findAllCustomers();
-    Customer findCustomerByIdJoinFetchAddress(long id);
+    Optional<Customer> findCustomerByIdJoinFetchAddress(long id);
     boolean checkIfCustomerIsNull(long i);
-    Customer findCustomerByIdJoinFetchOrder(long id);
+    Optional<Customer> findCustomerByIdJoinFetchOrder(long id);
+    Optional<Customer> findCustomerByEmailAddress(String email);
+    List<Customer> findAllCustomersJoinFetchAddress();
 
 }

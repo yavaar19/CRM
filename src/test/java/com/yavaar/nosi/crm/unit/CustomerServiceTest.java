@@ -93,9 +93,9 @@ class CustomerServiceTest {
     @Test
     void findCustomerByIdJoinFetchAddressTest() {
 
-        when(customerDao.findCustomerByIdJoinFetchAddress(1L)).thenReturn(customer);
+        when(customerDao.findCustomerByIdJoinFetchAddress(1L)).thenReturn(Optional.ofNullable(customer));
 
-        assertEquals(customer, customerService.findCustomerByIdJoinFetchAddress(1L));
+        assertEquals(customer, customerService.findCustomerByIdJoinFetchAddress(1L).get());
 
         verify(customerDao, times(1)).findCustomerByIdJoinFetchAddress(1L);
 
@@ -115,11 +115,22 @@ class CustomerServiceTest {
     @Test
     void findCustomerByIdJoinFetchOrderTest() {
 
-        when(customerDao.findCustomerByIdJoinFetchOrder(1L)).thenReturn(customer);
+        when(customerDao.findCustomerByIdJoinFetchOrder(1L)).thenReturn(Optional.ofNullable(customer));
 
-        assertEquals(customer, customerService.findCustomerByIdJoinFetchOrder(1L));
+        assertEquals(customer, customerService.findCustomerByIdJoinFetchOrder(1L).get());
 
         verify(customerDao, times(1)).findCustomerByIdJoinFetchOrder(1L);
+
+    }
+
+    @Test
+    void canFindCustomerByEmail() {
+
+        when(customerDao.findCustomerByEmail("jonhy@gmail.com")).thenReturn(Optional.ofNullable(customer));
+
+        assertEquals(Optional.of(customer), customerService.findCustomerByEmailAddress("jonhy@gmail.com"));
+
+        verify(customerDao, times(1)).findCustomerByEmail("jonhy@gmail.com");
 
     }
 

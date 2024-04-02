@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.service;
 
 import com.yavaar.nosi.crm.dao.ProductDao;
 import com.yavaar.nosi.crm.entity.Product;
+import com.yavaar.nosi.crm.exception.ProductNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,17 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Optional<Product> findProductById(long id) {
-        return productDao.findById(id);
+
+        Optional<Product> product = productDao.findById(id);
+
+        if (product.isEmpty()) {
+
+            throw new ProductNotFoundException("Product does not exist!");
+
+        }
+
+        return product;
+
     }
 
     @Override
@@ -46,7 +57,7 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public boolean checkIfProductIsNull(long id) {
 
-        Optional<Product> foundProduct = findProductById(id);
+        Optional<Product> foundProduct = productDao.findById(id);
 
         return foundProduct.isEmpty();
 

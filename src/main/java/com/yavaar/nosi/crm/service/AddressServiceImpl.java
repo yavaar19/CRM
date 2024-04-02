@@ -2,6 +2,7 @@ package com.yavaar.nosi.crm.service;
 
 import com.yavaar.nosi.crm.dao.AddressDao;
 import com.yavaar.nosi.crm.entity.Address;
+import com.yavaar.nosi.crm.exception.AddressNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,15 @@ public class AddressServiceImpl implements AddressService{
     @Override
     public Optional<Address> findAddressById(long id) {
 
-        return addressDao.findById(id);
+        Optional<Address> address = addressDao.findById(id);
+
+        if (address.isEmpty()) {
+
+            throw new AddressNotFoundException("Address does not exist!");
+
+        }
+
+        return address;
 
     }
 
@@ -49,16 +58,24 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public Address findAddressByIdJoinFetchCustomer(long id) {
+    public Optional<Address> findAddressByIdJoinFetchCustomer(long id) {
 
-        return addressDao.findAddressByIdJoinFetchCustomer(id);
+        Optional<Address> address = addressDao.findAddressByIdJoinFetchCustomer(id);
+
+        if (address.isEmpty()) {
+
+            address = addressDao.findById(id);
+
+        }
+
+        return address;
 
     }
 
     @Override
     public boolean checkIfAddressIsNull(long id) {
 
-        Optional<Address> address = findAddressById(id);
+        Optional<Address> address = addressDao.findById(id);
 
         return address.isEmpty();
 

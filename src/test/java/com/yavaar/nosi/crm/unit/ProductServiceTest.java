@@ -3,6 +3,7 @@ package com.yavaar.nosi.crm.unit;
 import com.yavaar.nosi.crm.dao.ProductDao;
 import com.yavaar.nosi.crm.entity.Product;
 import com.yavaar.nosi.crm.entity.Status;
+import com.yavaar.nosi.crm.exception.ProductNotFoundException;
 import com.yavaar.nosi.crm.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -99,6 +99,19 @@ public class ProductServiceTest {
         assertFalse(productService.checkIfProductIsNull(1L));
 
         verify(productDao, times(1)).findById(1L);
+
+    }
+
+    @Test
+    void productNotFoundException() {
+
+        Exception exception = assertThrows(ProductNotFoundException.class, () -> {
+
+            productService.findProductById(100);
+
+        });
+
+        assertEquals("Product does not exist!", exception.getMessage());
 
     }
 
